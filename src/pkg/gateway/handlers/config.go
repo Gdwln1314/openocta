@@ -518,6 +518,11 @@ func mergePatchWithPath(base, patch map[string]interface{}, path []string) map[s
 			delete(result, k)
 			continue
 		}
+		// mcp.servers.<server> 使用替换语义，否则切换连接类型时旧字段无法清除
+		if isMcpServersPath(path) {
+			result[k] = v
+			continue
+		}
 		// Phase 2f: mcp.servers.<server>.env 使用替换语义，否则删除环境变量时无法同步到后端
 		if k == "env" && isMcpServersEnvPath(path) {
 			result[k] = v
@@ -544,6 +549,11 @@ func mergePatchWithPath(base, patch map[string]interface{}, path []string) map[s
 		}
 	}
 	return result
+}
+
+// isMcpServersPath 判断当前路径是否为 mcp.servers（即 path 为 ["mcp", "servers"]）
+func isMcpServersPath(path []string) bool {
+	return len(path) == 2 && path[0] == "mcp" && path[1] == "servers"
 }
 
 // isMcpServersEnvPath 判断当前路径是否为 mcp.servers.<server>.env（即 path 为 ["mcp", "servers", "<server>"]）

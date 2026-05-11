@@ -368,7 +368,17 @@ export function handleMcpSave(host: AppViewState) {
   }
   if (host.mcpEditMode === "raw") {
     try {
-      JSON.parse(host.mcpRawJson);
+      const parsed = JSON.parse(host.mcpRawJson) as McpServerEntry;
+      const base = cloneConfigObject(host.configForm ?? host.configSnapshot?.config ?? {});
+      if (!base.mcp) {
+        base.mcp = { servers: {} };
+      }
+      const mcp = base.mcp as { servers?: Record<string, McpServerEntry> };
+      if (!mcp.servers) {
+        mcp.servers = {};
+      }
+      mcp.servers[host.mcpSelectedKey] = parsed;
+      host.configForm = base;
     } catch {
       host.mcpRawError = "Invalid JSON";
       return;
