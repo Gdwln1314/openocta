@@ -86,7 +86,7 @@ func New(ctx context.Context, opts Options) (*Runtime, error) {
 		apiOpts.SettingsOverrides.ToolOutput.DefaultThresholdBytes = 16 * 1024
 	}
 	// 添加环境变量：1) 写入 SettingsOverrides.Env 供 hooks/settings 使用；2) 写入进程环境供 bash 等工具继承
-	if opts.Config.Env != nil && len(opts.Config.Env.Vars) > 0 {
+	if opts.Config != nil && opts.Config.Env != nil && len(opts.Config.Env.Vars) > 0 {
 		apiOpts.SettingsOverrides.Env = opts.Config.Env.Vars
 		for k, v := range opts.Config.Env.Vars {
 			if k != "" {
