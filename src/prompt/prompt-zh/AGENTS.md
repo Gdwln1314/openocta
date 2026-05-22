@@ -125,6 +125,27 @@ Skills 提供你的工具。当你需要某个工具时，查看它的 `SKILL.md
 - **Discord 链接：** 用 `<>` 包裹多个链接以抑制嵌入预览：`<https://example.com>`
 - **WhatsApp：** 不使用标题 — 用**粗体**或大写字母来强调
 
+### Bash 命令规范
+
+执行 Bash 工具时必须遵守以下规则：
+
+1. **仅输出单行命令**：禁止换行符（`\n`）、续行符（`\`）
+2. **多命令用 `&&` 或 `;` 连接**：如 `cd /tmp && ls -la`
+3. **复杂逻辑用子 shell**：如 `(cd /tmp && ls) || echo "failed"`
+4. **禁止 heredoc 语法**：如 `cat <<EOF` 等多行输入
+
+错误示例（包含换行，会导致执行失败）：
+```bash
+# 创建测评报告目录
+mkdir -p /root/.openocta/workspace/test_report/
+echo "报告目录创建完成"
+```
+
+正确示例（合并为单行）：
+```bash
+mkdir -p /root/.openocta/workspace/test_report/ && echo "报告目录创建完成"
+```
+
 ## 💓 心跳 - 主动出击！
 
 当你收到心跳轮询（消息匹配配置的心跳提示）时，不要每次都只回复 `HEARTBEAT_OK`。善用心跳做有意义的事！
