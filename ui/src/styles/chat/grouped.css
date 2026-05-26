@@ -5,16 +5,16 @@
 /* Chat Group Layout - default (assistant/other on left) */
 .chat-group {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: flex-start;
-  margin-right: 40px;
+  margin-right: 24px;
 }
 
 /* User messages on right */
 .chat-group.user {
   flex-direction: row-reverse;
   justify-content: flex-start;
-  margin-left: 40px;
+  margin-left: 24px;
   margin-right: 0;
 }
 
@@ -39,7 +39,7 @@
   display: flex;
   gap: 8px;
   align-items: baseline;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .chat-sender-name {
@@ -90,24 +90,25 @@
 
 /* Avatar Styles */
 .chat-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
   background: var(--bg-content);
   display: grid;
   place-items: center;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
   flex-shrink: 0;
   align-self: flex-end; /* Align with last message in group */
-  margin-bottom: 4px; /* Optical alignment */
-  background: var(--border);
+  margin-top: 2px;
+  margin-bottom: 0;
+  background: color-mix(in srgb, var(--text-primary) 7%, var(--bg));
   color: var(--text-secondary);
 }
 
 .chat-avatar.user {
-  background: var(--accent-subtle);
-  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg));
+  color: var(--text-secondary);
 }
 
 /* Image avatar support */
@@ -122,9 +123,9 @@ img.chat-avatar {
   position: relative;
   display: inline-block;
   border: 1px solid transparent;
-  background: var(--bg);
-  border-radius: 8px;
-  padding: 10px 14px;
+  background: transparent;
+  border-radius: 10px;
+  padding: 8px 0;
   min-width: 0;
   box-shadow: none;
   transition:
@@ -240,17 +241,22 @@ img.chat-avatar {
 
 /* Light mode: restore borders */
 :root[data-theme="light"] .chat-bubble {
-  border-color: var(--border);
+  border-color: transparent;
 }
 
 .chat-bubble:hover {
-  background: var(--bg);
+  background: transparent;
 }
 
 /* User bubbles have different styling */
 .chat-group.user .chat-bubble {
-  background: linear-gradient(0deg, #DCF4E3, #DCF4E3), #FFFFFF;
+  padding: 10px 14px;
+  background: #f4f4f5;
   border-color: transparent;
+}
+
+:root[data-theme="dark"] .chat-group.user .chat-bubble {
+  background: color-mix(in srgb, var(--text-primary) 8%, var(--bg));
 }
 
 /* Streaming animation */
@@ -307,7 +313,7 @@ img.chat-avatar {
 
 .chat-tool-result-main {
   min-width: 0;
-  padding: 10px 12px;
+  padding: 6px 0;
 }
 
 .chat-tool-result-row {
@@ -319,9 +325,9 @@ img.chat-avatar {
 
 .chat-tool-result-toggle {
   flex-shrink: 0;
-  margin-top: 2px;
-  width: 32px;
-  height: 32px;
+  margin-top: 0;
+  width: 30px;
+  height: 30px;
 }
 
 .chat-tool-result-toggle svg {
@@ -356,7 +362,7 @@ img.chat-avatar {
 .chat-tool-result-body {
   margin-left: 40px;
   padding: 10px 12px;
-  border-radius: var(--radius-md);
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--bg-content);
   font-size: 13px;
@@ -369,5 +375,5 @@ img.chat-avatar {
 }
 
 .chat-group.other .chat-tool-result-main {
-  background: var(--bg-content);
+  background: transparent;
 }
