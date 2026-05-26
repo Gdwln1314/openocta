@@ -409,10 +409,6 @@ function renderCollapsedToolResult(
   _onOpenSidebar?: (content: string) => void,
 ) {
   const bodyDoc = mergeToolExpandableBody(markdown, toolCards);
-  const hasExpandable =
-    Boolean(bodyDoc?.trim()) ||
-    images.length > 0 ||
-    Boolean(reasoningMarkdown?.trim());
   const primaryCommand =
     toolCards
       .filter((card) => card.kind === "call")
@@ -423,7 +419,7 @@ function renderCollapsedToolResult(
 
   return html`
     <div class="chat-tool-result-block">
-      <details class="chat-tool-run" ?open=${hasExpandable}>
+      <details class="chat-tool-run">
         <summary class="chat-tool-run__summary">
           <span class="chat-tool-run__icon">${icons.wrench}</span>
           <span class="chat-tool-run__title">${runLabel}</span>

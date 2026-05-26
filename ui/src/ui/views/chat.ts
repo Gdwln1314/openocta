@@ -639,7 +639,8 @@ function groupMessages(items: ChatItem[]): Array<ChatItem | MessageGroup> {
     }
 
     const normalized = normalizeMessage(item.message);
-    const role = normalizeRoleForGrouping(normalized.role);
+    const normalizedRole = normalizeRoleForGrouping(normalized.role);
+    const role = normalizedRole === "tool" ? "assistant" : normalizedRole;
     const timestamp = normalized.timestamp || Date.now();
 
     if (!currentGroup || currentGroup.role !== role) {
