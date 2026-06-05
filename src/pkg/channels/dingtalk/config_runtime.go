@@ -15,7 +15,8 @@ import (
 //	  "allowedIds": ["user-id-1"],
 //	  "credentials": {
 //	    "clientId": "your-client-id",
-//	    "clientSecret": "your-client-secret"
+//	    "clientSecret": "your-client-secret",
+//	    "defaultWebhook": "https://oapi.dingtalk.com/robot/send?access_token=xxx"
 //	  }
 //	}
 func NewRuntimeFromConfig(raw map[string]interface{}, sink channels.InboundSink) (channels.RuntimeChannel, error) {
@@ -30,6 +31,7 @@ func NewRuntimeFromConfig(raw map[string]interface{}, sink channels.InboundSink)
 
 	clientID, _ := creds["clientId"].(string)
 	clientSecret, _ := creds["clientSecret"].(string)
+	defaultWebhook, _ := creds["defaultWebhook"].(string)
 	if clientID == "" || clientSecret == "" {
 		return nil, fmt.Errorf("dingtalk: clientId and clientSecret are required")
 	}
@@ -41,7 +43,7 @@ func NewRuntimeFromConfig(raw map[string]interface{}, sink channels.InboundSink)
 		AllowedIDs: extractStringSlice(raw, "allowedIds"),
 	}
 
-	return NewRuntime(clientID, clientSecret, baseCfg, sink), nil
+	return NewRuntime(clientID, clientSecret, defaultWebhook, baseCfg, sink), nil
 }
 
 // extractBool 是从 Feishu 复用风格的简单布尔解析。

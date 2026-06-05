@@ -3,11 +3,11 @@ package dingtalk
 import (
 	"context"
 	"fmt"
-	"sync"
-	"time"
-	"strings"
 	"github.com/open-dingtalk/dingtalk-stream-sdk-go/chatbot"
 	"github.com/open-dingtalk/dingtalk-stream-sdk-go/client"
+	"strings"
+	"sync"
+	"time"
 
 	"github.com/openocta/openocta/pkg/channels"
 	"github.com/openocta/openocta/pkg/logging"
@@ -18,8 +18,9 @@ import (
 type Runtime struct {
 	*channels.BaseRuntimeImpl
 
-	clientID     string
-	clientSecret string
+	clientID       string
+	clientSecret   string
+	defaultWebhook string
 
 	streamClient *client.StreamClient
 	ctx          context.Context
@@ -33,13 +34,14 @@ type Runtime struct {
 }
 
 // NewRuntime 创建一个 DingTalk Runtime 实例。
-// clientID / clientSecret 为钉钉应用凭证。
-func NewRuntime(clientID, clientSecret string, cfg channels.BaseRuntimeConfig, sink channels.InboundSink) *Runtime {
+// clientID / clientSecret 为钉钉应用凭证，defaultWebhook 为可选的默认 webhook（用于定时任务等场景）。
+func NewRuntime(clientID, clientSecret, defaultWebhook string, cfg channels.BaseRuntimeConfig, sink channels.InboundSink) *Runtime {
 	base := channels.NewBaseRuntimeImpl(channelID, cfg.AccountID, cfg, sink)
 	return &Runtime{
 		BaseRuntimeImpl: base,
 		clientID:        clientID,
 		clientSecret:    clientSecret,
+		defaultWebhook:  defaultWebhook,
 		logger:          logging.Sub("dingtalk-runtime"),
 	}
 }
@@ -106,9 +108,9 @@ func (r *Runtime) Send(msg *channels.RuntimeOutboundMessage) error {
 		return fmt.Errorf("dingtalk runtime: not running")
 	}
 
-	chatID := msg.ChatID
+	chatID := strings.ToLower(msg.ChatID)
 	if chatID == "" {
-		chatID = msg.MetadataString("chat_id")
+		chatID = strings.ToLower(msg.MetadataString("chat_id"))
 	}
 	if chatID == "" {
 		r.logger.Error("Send failed: chatID is required")
@@ -122,6 +124,16 @@ func (r *Runtime) Send(msg *channels.RuntimeOutboundMessage) error {
 	// 根据 chatID 获取 sessionWebhook
 	raw, ok := r.sessionWebhooks.Load(chatID)
 	if !ok {
+		// 尝试使用默认 webhook（定时任务等场景）
+		if r.defaultWebhook != "" {
+			r.logger.Info("using default webhook for chat %s", chatID)
+			if err := r.sendDirectReply(r.defaultWebhook, content); err != nil {
+				r.logger.Error("Send failed: %v", err)
+				return err
+			}
+			r.logger.Info("DingTalk message sent successfully via default webhook, chat_id=%s", chatID)
+			return nil
+		}
 		r.logger.Error("Send failed: no session_webhook found for chat %s", chatID)
 		return fmt.Errorf("dingtalk runtime: no session_webhook found for chat %s", chatID)
 	}
@@ -195,10 +207,10 @@ func (r *Runtime) onChatBotMessageReceived(ctx context.Context, data *chatbot.Bo
 	senderNick := data.SenderNick
 
 	// 私聊：chatID 使用 senderID；群聊：使用 ConversationId
-	chatID := senderID
+	chatID := strings.ToLower(senderID)
 	chatType := "dm"
 	if data.ConversationType != "1" {
-		chatID = data.ConversationId
+		chatID = strings.ToLower(data.ConversationId)
 		chatType = "group"
 	}
 
